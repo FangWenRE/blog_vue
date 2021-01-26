@@ -3,8 +3,11 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
+var user = JSON.parse(window.localStorage.getItem('userInfo'));
 export default new Vuex.Store({
-    state: {},
+    state: {
+        uid: ""
+    },
     mutations: {},
     actions: {},
     modules: {}
