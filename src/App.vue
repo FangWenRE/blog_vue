@@ -1,5 +1,4 @@
 <template>
-
     <el-container class="page">
         <!--  导航菜单和轮播图  -->
         <el-header>
@@ -29,10 +28,9 @@
         <!--  底部区域  -->
         <el-footer>
             <router-view name="footer"></router-view>
+
         </el-footer>
-
     </el-container>
-
 </template>
 
 <script>
@@ -71,14 +69,11 @@
             display: block;
             text-align: center;
             margin: 20px 0;
-
         }
     }
 
     .main {
-
-        height: 700px;
-        background-color: #f6f6f6;
+        background-color: #ffffff;
 
         .markdown-body {
             height: 100%;

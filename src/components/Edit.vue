@@ -44,7 +44,7 @@
                 defaultOpen: "preview",
                 title: "",
                 value: '',
-                about: "",
+                about: "文章简介...",
                 options: [{
                     value: 'HTML',
                     label: 'HTML'
@@ -82,24 +82,42 @@
 
             },
             saveContext(value, render) {
+
                 if (this.title.length <= 0) {
                     this.$message.error("标题未填写！");
                     return false
+                } else if (this.classify.length <= 0) {
+                    this.$message.error("分类未填写！");
+                    return false
                 }
-                let time = dateFormat("YYYY-mm-dd HH:MM:SS", new Date())
-                this.$http.post("/vue/edit", {
-                    title: this.title,
-                    about: this.about,
+                let time = this.dateFormat("YYYY-mm-dd HH:MM:SS", new Date())
+                let about = this.classify.join(",").toString()
+                console.log(about);
+                this.$http.post("/vue/save", {
                     author: this.$store.state.uid,
-                    ctime: time,
-                    etime: time,
+                    title: this.title,
+                    classify: this.classify,
+                    c_time: time,
+                    e_time: time,
+                    about: about,
                     text: value,
                     html: render
+                }).then(respon => {
+                    if (respon.data == 1) {
+                        this.$message.success("保存成功！")
+                        setTimeout(() => {
+                            this.$router.push("/")
+                        }, 2000)
+                    } else if (respon.data == 2) {
+                        this.$message.info("标题存在了，换个吧！")
+                        return false;
+                    } else {
+                        this.$message.error("保存失败！")
+                        return false;
+                    }
+                }).catch(respon => {
+                    this.$message.error("网络错误")
                 })
-
-
-                console.log()
-
             }
         }
     }

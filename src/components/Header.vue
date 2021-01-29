@@ -123,6 +123,16 @@
 </template>
 
 <script>
+    var user = JSON.parse(window.localStorage.getItem("userInfo"));
+    if (user == null) {
+        user = {
+            uid: "null",
+            username: "null",
+            isButton: true,
+            isUser: false,
+            isEdit: false,
+        }
+    }
     export default {
         name: "Header",
         data() {
@@ -135,7 +145,6 @@
                     callback();
                 }
             };
-            var user = JSON.parse(window.localStorage.getItem('userInfo'));
             return {
                 input: "", // 搜索框
 
@@ -166,20 +175,17 @@
                         {validator: validatePass, trigger: 'blur'}],
                 },
                 userInfo: {
+                    uid: user.uid,
                     username: user.username,
                     isButton: user.isButton,
-                    isUser: user.isUser
+                    isUser: user.isUser,
+                    isEdit: user.isEdit
                 }
 
             };
         },
         methods: {
-            created() {
-                var user = JSON.parse(window.localStorage.getItem("userInfo"));
-                this.userInfo.username = user.username
-                this.userInfo.isButton = user.isButton
-                this.userInfo.isUser = user.isUser
-            },
+
             // 头部搜索框，啥都不会，百度一下
             searchBybaidu() {
                 let baseUrl = "https://www.baidu.com/s?ie=utf-8&wd="
@@ -211,16 +217,21 @@
                         let data = respon.data.data;
                         var storage = window.localStorage;
                         this.$store.state.uid = data.uid
+                        this.userInfo.uid = data.uid
                         this.userInfo.username = data.username;
                         this.userInfo.isButton = false
                         this.userInfo.isUser = true
+                        this.userInfo.isEdit = false
                         storage.setItem("userInfo", JSON.stringify(this.userInfo))
                         this.$message({
                             message: '登录成功！',
                             type: 'success'
                         });
-                        // window.location.reload()
-                        return true
+                        setTimeout(() => {
+                            window.location.reload()
+                            return true
+                        }, 1000)
+
                     }
                 }).catch(error => {
                     console.error(error)
@@ -264,11 +275,12 @@
             layOut() {
                 var storage = window.localStorage;
                 this.userInfo.username = "null"
+                this.userInfo.uid = "null"
                 this.userInfo.isButton = true
                 this.userInfo.isUser = false
+                this.userInfo.isEdit = true
                 storage.setItem("userInfo", JSON.stringify(this.userInfo))
                 window.location.reload()
-                console.log("777")
             }
         },
 

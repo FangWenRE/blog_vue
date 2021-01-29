@@ -1,47 +1,24 @@
 <template>
-    <div class="aside">
+    <div class="content-aside">
          <span class="edit">
-             <el-link :underline="false" href="/edit" style="color: #ffffff">
-             <el-button type="primary" icon="el-icon-edit">
+             <el-link :underline="false" href="/edit" style="color: #ffffff" :disabled="isEdit">
+             <el-button type="primary" icon="el-icon-edit" :disabled="isEdit">
                  写博客
              </el-button>
              </el-link>
          </span>
         <el-menu
-                default-active="2"
-                class="el-menu-vertical-demo"
-                @open="handleOpen"
-                @close="handleClose">
-            <el-submenu index="1">
+                default-active="1"
+                class="el-menu-vertical">
+            <el-submenu v-for="(value, key, index) in articles" :key="key" :index="index.toString()">
                 <template slot="title">
                     <img src="../assets/logo.png" alt="" class="img-ico">
-                    <span>导航一</span>
+                    <span>{{key}}</span>
                 </template>
-                <el-menu-item-group>
-                    <template slot="title">分组一</template>
-                    <el-menu-item index="1-1">选项1</el-menu-item>
-                    <el-menu-item index="1-2">选项2</el-menu-item>
-                </el-menu-item-group>
-                <el-menu-item-group title="分组2">
-                    <el-menu-item index="1-3">选项3</el-menu-item>
-                </el-menu-item-group>
-                <el-submenu index="1-4">
-                    <template slot="title">选项4</template>
-                    <el-menu-item index="1-4-1">选项1</el-menu-item>
-                </el-submenu>
+                <el-menu-item v-for="(item,i) in value" :index="index.toString()+'-'+i.toString()" :key="item.title"
+                              @click="handle(item)" class="item-title">{{item.title}}
+                </el-menu-item>
             </el-submenu>
-            <el-menu-item index="2">
-                <i class="el-icon-menu"></i>
-                <span slot="title">导航二</span>
-            </el-menu-item>
-            <el-menu-item index="3" disabled>
-                <i class="el-icon-document"></i>
-                <span slot="title">导航三</span>
-            </el-menu-item>
-            <el-menu-item index="4">
-                <i class="el-icon-setting"></i>
-                <span slot="title">导航四</span>
-            </el-menu-item>
         </el-menu>
     </div>
 
@@ -51,13 +28,30 @@
 <script>
     export default {
         name: "Aside",
-        methods: {
-            handleOpen(a, b) {
-                console.log(a, b)
+        data() {
+            return {
+                isEdit: this.$store.state.isEdit,
+                articles: {}
+            }
+        },
+        created() {
+            this.$http.get("/vue/art_index", {
+                params: {
+                    uid: this.$store.state.uid
+                }
+            }).then((respon => {
+                this.articles = respon.data
 
-            },
-            handleClose(a, b) {
-                console.log(a, b)
+            })).catch(reason => this.$message.error("网络错误"))
+        },
+        methods: {
+            handle(object) {
+                this.$router.push({
+                    path: "/display",
+                    query: {
+                        object: object
+                    }
+                });
             }
         }
     }
@@ -72,8 +66,12 @@
         vertical-align: middle;
     }
 
-    .el-submenu, .el-menu-item {
-        text-align: center;
+    .item-title {
+        text-align: left;
+        width: 249px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .edit {
