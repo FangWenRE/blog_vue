@@ -29,7 +29,6 @@
 
         <mavon-editor v-model="value"
                       @save="saveContext"
-                      @change="changeContext"
 
         />
     </div>
@@ -44,7 +43,7 @@
                 defaultOpen: "preview",
                 title: "",
                 value: '',
-                about: "文章简介...",
+                about: "文章简介:",
                 options: [{
                     value: 'HTML',
                     label: 'HTML'
@@ -55,8 +54,21 @@
                     value: 'JavaScript',
                     label: 'JavaScript'
                 }],
-                classify: []
+                classify: [],
+                oldInfo: {},
+                edit: false
             };
+        },
+        created() {
+            let object = this.$route.query.object
+            if (object != undefined) {
+                this.title = object.title
+                this.value = object.text
+                this.about = object.about
+                this.classify = object.classify.split(",")
+                this.oldInfo = object
+            }
+            this.edit = this.$route.query.edit
         },
         methods: {
             dateFormat(fmt, date) {
@@ -78,11 +90,7 @@
                 }
                 return fmt;
             },
-            changeContext(value, render) {
-
-            },
             saveContext(value, render) {
-
                 if (this.title.length <= 0) {
                     this.$message.error("标题未填写！");
                     return false
@@ -90,16 +98,19 @@
                     this.$message.error("分类未填写！");
                     return false
                 }
-                let time = this.dateFormat("YYYY-mm-dd HH:MM:SS", new Date())
-                let about = this.classify.join(",").toString()
-                console.log(about);
+                let e_time = this.dateFormat("YYYY-mm-dd HH:MM:SS", new Date())
+                let classify = this.classify.join(",").toString()
+                let c_time = e_time
+                if (this.edit)
+                    c_time = this.oldInfo.c_time
+
                 this.$http.post("/vue/save", {
                     author: this.$store.state.uid,
                     title: this.title,
-                    classify: this.classify,
-                    c_time: time,
-                    e_time: time,
-                    about: about,
+                    classify: classify,
+                    c_time: c_time,
+                    e_time: e_time,
+                    about: this.about,
                     text: value,
                     html: render
                 }).then(respon => {
@@ -107,10 +118,8 @@
                         this.$message.success("保存成功！")
                         setTimeout(() => {
                             this.$router.push("/")
+                            window.location.reload()
                         }, 2000)
-                    } else if (respon.data == 2) {
-                        this.$message.info("标题存在了，换个吧！")
-                        return false;
                     } else {
                         this.$message.error("保存失败！")
                         return false;

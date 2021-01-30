@@ -1,15 +1,15 @@
 <template>
     <div class="content-aside">
          <span class="edit">
-             <el-link :underline="false" href="/edit" style="color: #ffffff" :disabled="isEdit">
-             <el-button type="primary" icon="el-icon-edit" :disabled="isEdit">
+             <el-link :underline="false" href="/edit" style="color: #ffffff" :disabled=!isEdit>
+             <el-button type="primary" icon="el-icon-edit" :disabled=!isEdit>
                  写博客
              </el-button>
              </el-link>
          </span>
         <el-menu
                 default-active="1"
-                class="el-menu-vertical">
+                class="el-menu-vertical" v-show=isEdit>
             <el-submenu v-for="(value, key, index) in articles" :key="key" :index="index.toString()">
                 <template slot="title">
                     <img src="../assets/logo.png" alt="" class="img-ico">

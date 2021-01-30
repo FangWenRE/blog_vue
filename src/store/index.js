@@ -6,7 +6,8 @@ Vue.use(Vuex)
 let user = JSON.parse(window.localStorage.getItem('userInfo'));
 if (user == null) {
     user = {
-        uid: "",
+        uid: "null",
+        username: "BlogNews",
         isEdit: false
     }
 }
@@ -15,6 +16,7 @@ export default new Vuex.Store({
 
     state: {
         uid: user.uid,
+        username: user.username,
         isEdit: user.isEdit
     },
     mutations: {},

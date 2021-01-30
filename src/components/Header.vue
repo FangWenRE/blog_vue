@@ -31,7 +31,7 @@
 
         <el-menu-item>
             <div style="width: 500px;">
-                <el-input placeholder="请输入内容" v-model="input" clearable>
+                <el-input placeholder="请输入内容" v-model="input" clearable @keyup.enter="searchBybaidu">
                     <el-button slot="append" @click="searchBybaidu">百度搜搜</el-button>
                 </el-input>
             </div>
@@ -64,7 +64,7 @@
         </el-menu-item>
 
 
-        <el-menu-item index="/ " v-show="this.userInfo.isButton">
+        <el-menu-item index="/register" v-show="this.userInfo.isButton">
             <el-button @click="loginRegistVis = true">注 册</el-button>
 
             <el-dialog
@@ -184,6 +184,10 @@
 
             };
         },
+        created() {
+            let self = this
+            document.addEventListener('keyup', self.onSubmit)
+        },
         methods: {
 
             // 头部搜索框，啥都不会，百度一下
@@ -221,13 +225,14 @@
                         this.userInfo.username = data.username;
                         this.userInfo.isButton = false
                         this.userInfo.isUser = true
-                        this.userInfo.isEdit = false
+                        this.userInfo.isEdit = true
                         storage.setItem("userInfo", JSON.stringify(this.userInfo))
                         this.$message({
                             message: '登录成功！',
                             type: 'success'
                         });
                         setTimeout(() => {
+                            this.$router.push("/")
                             window.location.reload()
                             return true
                         }, 1000)
@@ -278,8 +283,9 @@
                 this.userInfo.uid = "null"
                 this.userInfo.isButton = true
                 this.userInfo.isUser = false
-                this.userInfo.isEdit = true
+                this.userInfo.isEdit = false
                 storage.setItem("userInfo", JSON.stringify(this.userInfo))
+                this.$router.push("/")
                 window.location.reload()
             }
         },

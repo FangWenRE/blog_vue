@@ -1,21 +1,28 @@
 <template>
     <div class="block">
         <el-timeline>
-            <el-timeline-item timestamp="2020-10 " placement="top">
+            <el-timeline-item v-for="(item,index) in array" placement="top" :timestamp="item.e_time" :key="item.title">
                 <el-card shadow="hover">
-                    <el-link href="https://colorhunt.co/palettes/popular" target="_blank">
-                        <h3>更新 Github 模板</h3></el-link>
-                    <p>Popular Schemes for Designers and Artists
-                        A curated collection of the most popular and trendy color palettes. Get the perfect color ideas
-                        for your design or art project.</p>
-                    <b>提交于 2018/4/3 20:46</b>
+                    <el-link @click="handle(item)" target="_blank">
+                        <h3>{{item.title}}</h3>
+                    </el-link>
+                    <p class="bloc-about">{{item.about}}</p>
+                    <b class="bloc-time">创建于 {{item.c_time}}</b>
                     <span class="operate">
-                        <el-link type="primary">编辑</el-link>|
-                        <el-link type="danger">删除</el-link>
+                        <el-link type="primary" @click="update(item)" :disabled=!isEdit>编辑</el-link>|
+                         <el-popconfirm
+                                 icon="el-icon-info"
+                                 icon-color="red"
+                                 title="确定删除这条博客吗？"
+                                 @confirm="del(item,index)" :disabled=!isEdit>
+                        <el-link type="danger" slot="reference" :disabled=!isEdit>删除</el-link>
+                    </el-popconfirm>
                     </span>
 
                 </el-card>
             </el-timeline-item>
+
+        </el-timeline>
     </div>
 </template>
 
@@ -24,8 +31,48 @@
         name: "Context",
         data() {
             return {
-                time: "",
-                test: "132"
+                array: [],
+                isEdit: this.$store.state.isEdit
+            }
+        },
+        created() {
+            this.$http.get("/vue/top_article", {
+                params: {
+                    uid: this.$store.state.uid,
+                    param: "e_time",
+                    limit: 5
+                }
+            }).then(respon => {
+                let array = respon.data
+                array.sort((a, b) => {
+                    return a.e_time > b.e_time
+                })
+                console.log(array)
+                this.array = array
+            }).catch(respon => {
+                console.error(respon)
+            })
+        },
+        methods: {
+            del(item, index) {
+                this.array.splice(index, 1);
+            },
+            update(object) {
+                this.$router.push({
+                    path: "/edit",
+                    query: {
+                        object,
+                        edit: true
+                    }
+                });
+            },
+            handle(object) {
+                this.$router.push({
+                    path: "/display",
+                    query: {
+                        object: object,
+                    }
+                });
             }
         },
         filters: {
@@ -48,12 +95,17 @@
 </script>
 
 <style scoped>
-    b {
+    .bloc-time {
         color: #67C23A;
     }
 
-    .el-calendar-table__row {
-        height: 20px;
+    .bloc-about {
+        color: rgba(46, 50, 80, 0.78);
+        font-size: 16px;
+        width: 950px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .operate {
@@ -61,7 +113,7 @@
 
     }
 
-    .el-link {
+    .operate .el-link {
         margin: 0 10px;
     }
 </style>
